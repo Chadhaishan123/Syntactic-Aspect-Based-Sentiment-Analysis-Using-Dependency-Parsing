@@ -1,0 +1,1 @@
+# Syntactic-Aspect-Based-Sentiment-Analysis-Using-Dependency-Parsing
