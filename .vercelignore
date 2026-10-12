@@ -1,0 +1,11 @@
+# Tell Vercel to ignore Python backend files so it only builds the React Vite frontend
+requirements.txt
+main.py
+live_sources.py
+evaluation.py
+data/
+Dockerfile
+render.yaml
+Procfile
+.venv/
+__pycache__/
