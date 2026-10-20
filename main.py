@@ -852,6 +852,91 @@ async def generate_report_endpoint(payload: ReportGenerateRequest):
         payload.organization,
     )
 
+import aspect_qa
+import sarcasm
+import taxonomy
+
+# ---------------------------------------------------------
+# Feature 1: Automated Aspect-QA Endpoints
+# ---------------------------------------------------------
+class AspectQARequest(BaseModel):
+    question: str = Field(..., min_length=2, max_length=300)
+    reviews: list[str] = Field(default_factory=list, max_length=150)
+
+@app.get("/api/qa/presets")
+def get_qa_presets():
+    return {"presets": aspect_qa.QA_PRESET_QUESTIONS}
+
+@app.post("/api/qa/ask", response_model=aspect_qa.AspectQAResponse)
+async def ask_aspect_question_endpoint(payload: AspectQARequest):
+    """Answers natural language questions about aspects using dependency parse graphs."""
+    reviews = payload.reviews
+    if not reviews:
+        # Fallback to recent reviews in memory
+        reviews = [a.text for a in get_recent_analyses(20)] or [
+            "The battery life is really awful, but the vibrant display is stunning.",
+            "The keyboard tactile feedback is unmatched, although the touchpad could be smoother.",
+            "Boot up time is super fast, yet the cooling fan is noticeably loud."
+        ]
+    return await asyncio.to_thread(
+        aspect_qa.answer_aspect_question,
+        payload.question,
+        reviews,
+        run_syntactic_analysis,
+    )
+
+# ---------------------------------------------------------
+# Feature 2: Syntactic Sarcasm & Irony Detector Endpoints
+# ---------------------------------------------------------
+class SarcasmRequest(BaseModel):
+    text: str = Field(..., min_length=2, max_length=500)
+
+@app.get("/api/sarcasm/presets")
+def get_sarcasm_presets():
+    return {"presets": sarcasm.SARCASM_PRESETS}
+
+@app.post("/api/sarcasm/analyze", response_model=sarcasm.SarcasmAnalysisResult)
+async def analyze_sarcasm_endpoint(payload: SarcasmRequest):
+    """Detects irony and contrasts naive bag-of-words against true syntactic polarity."""
+    return await asyncio.to_thread(
+        sarcasm.analyze_sarcasm_and_irony,
+        payload.text,
+        run_syntactic_analysis,
+    )
+
+# ---------------------------------------------------------
+# Feature 3: Custom Aspect Ontology & Taxonomy Endpoints
+# ---------------------------------------------------------
+class TaxonomyTestRequest(BaseModel):
+    text: str = Field(..., min_length=2, max_length=500)
+    domain_id: str = Field(default="laptops_hardware")
+    custom_categories: list[taxonomy.AspectCategoryRule] | None = None
+
+@app.get("/api/taxonomy/domains")
+def get_taxonomy_domains():
+    return {
+        "domains": [
+            {
+                "domain_id": d.domain_id,
+                "name": d.name,
+                "description": d.description,
+                "categories": [c.model_dump() for c in d.categories]
+            }
+            for d in taxonomy.BUILTIN_ONTOLOGIES.values()
+        ]
+    }
+
+@app.post("/api/taxonomy/test", response_model=taxonomy.TaxonomyTestResult)
+async def test_taxonomy_mapping_endpoint(payload: TaxonomyTestRequest):
+    """Tests aspect keyword mapping against hierarchical custom taxonomy categories."""
+    return await asyncio.to_thread(
+        taxonomy.map_aspects_to_ontology,
+        payload.text,
+        payload.domain_id,
+        run_syntactic_analysis,
+        payload.custom_categories,
+    )
+
 @app.get("/api/benchmarks")
 def get_benchmarks():
     return {

@@ -14,6 +14,9 @@ import Methodology from './pages/Methodology';
 import History from './pages/History';
 import Compare from './pages/Compare';
 import Simulator from './pages/Simulator';
+import AspectQA from './pages/AspectQA';
+import SarcasmDetector from './pages/SarcasmDetector';
+import TaxonomyStudio from './pages/TaxonomyStudio';
 
 import './styles.css';
 
@@ -32,6 +35,9 @@ function AppLayout() {
             <Route path="/studio" element={<Studio />} />
             <Route path="/compare" element={<Compare />} />
             <Route path="/simulator" element={<Simulator />} />
+            <Route path="/aspect-qa" element={<AspectQA />} />
+            <Route path="/sarcasm" element={<SarcasmDetector />} />
+            <Route path="/taxonomy" element={<TaxonomyStudio />} />
             <Route path="/live" element={<LiveStream />} />
             <Route path="/batch" element={<BatchInspector />} />
             <Route path="/insights" element={<Insights />} />

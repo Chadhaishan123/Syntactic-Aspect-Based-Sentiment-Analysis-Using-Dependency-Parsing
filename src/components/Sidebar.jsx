@@ -14,14 +14,20 @@ import {
   GitFork,
   Swords,
   FlaskConical,
+  MessageSquare,
+  ShieldAlert,
+  FolderTree,
 } from 'lucide-react';
 import { useRealtime } from '../context/RealtimeContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: LayoutDashboard },
   { to: '/analyze', label: 'Syntactic Studio', icon: Sparkles },
+  { to: '/aspect-qa', label: 'Aspect-QA Engine', icon: MessageSquare, badge: 'AI' },
   { to: '/compare', label: 'Battleground Duel', icon: Swords, badge: 'NEW' },
   { to: '/simulator', label: 'What-If Simulator', icon: FlaskConical, badge: 'LAB' },
+  { to: '/sarcasm', label: 'Sarcasm Shield', icon: ShieldAlert, badge: 'FILTER' },
+  { to: '/taxonomy', label: 'Taxonomy Studio', icon: FolderTree, badge: 'SETUP' },
   { to: '/live', label: 'Live Stream', icon: Activity, badge: 'LIVE' },
   { to: '/batch', label: 'Batch & Benchmarks', icon: Layers },
   { to: '/insights', label: 'Aspect Intelligence', icon: BarChart3 },
