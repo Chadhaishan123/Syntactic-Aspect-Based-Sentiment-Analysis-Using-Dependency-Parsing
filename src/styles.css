@@ -3505,3 +3505,273 @@ th.arch-col-highlight {
 .btn-icon-subtle:hover {
   color: var(--text-main);
 }
+
+/* ==========================================================================
+   "What-If" Counterfactual Grammar Simulator (/simulator)
+   ========================================================================== */
+
+.simulator-hero {
+  background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 45%),
+              radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 45%),
+              var(--bg-surface);
+}
+
+.code-pill {
+  font-family: var(--font-mono);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  color: #38bdf8;
+}
+
+.quick-suggestions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.qs-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--amber);
+}
+
+.btn-suggestion-pill {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-suggestion-pill:hover {
+  background: var(--bg-surface-hover);
+  color: #fff;
+  border-color: var(--amber);
+  box-shadow: 0 0 10px var(--amber-glow);
+}
+
+/* Simulator KPI Banner */
+.sim-kpi-banner {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 22px;
+}
+
+.sim-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .sim-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sim-kpi-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sim-kpi-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.sim-kpi-values {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kpi-old {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.kpi-new {
+  font-family: var(--font-mono);
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.kpi-badge {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.badge-pos {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-neg {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.tag-flipped {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.35);
+}
+
+.rule-code {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  color: #cbd5e1;
+  background: var(--bg-base);
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: block;
+  max-width: 320px;
+  overflow-x: auto;
+}
+
+/* Explainability Box */
+.explainability-log-box {
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 220px;
+}
+
+.log-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.log-bullet {
+  color: var(--amber);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.log-text {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+/* Dependency Token Deck in Simulator */
+.tree-toggle-pills {
+  display: flex;
+  gap: 8px;
+}
+
+.token-stream-deck {
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.token-flow-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sim-token-node {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+  transition: all 0.2s ease;
+}
+
+.stn-text {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.stn-pos {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.stn-dep {
+  font-size: 0.7rem;
+  font-family: var(--font-mono);
+  color: #a78bfa;
+  margin-top: 2px;
+}
+
+.sim-token-node.token-aspect {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+}
+
+.sim-token-node.token-opinion {
+  border-color: #c084fc;
+  background: rgba(192, 132, 252, 0.12);
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.2);
+}
+
+.sim-token-node.token-negation {
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, 0.15);
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.25);
+}
+
+.token-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.dot-ruby {
+  background: #f43f5e;
+  box-shadow: 0 0 6px rgba(244, 63, 94, 0.6);
+}

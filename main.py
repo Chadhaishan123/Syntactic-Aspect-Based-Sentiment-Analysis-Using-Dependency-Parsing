@@ -800,6 +800,38 @@ async def run_product_comparison(payload: CompareRequest):
     )
     return result
 
+import counterfactual
+
+class SimulatorSuggestRequest(BaseModel):
+    text: str = Field(..., min_length=2, max_length=500)
+
+class SimulatorRunRequest(BaseModel):
+    base_text: str = Field(..., min_length=2, max_length=500)
+    mutated_text: str = Field(..., min_length=2, max_length=500)
+    mutation_type: str = Field(default="custom", max_length=100)
+    mutation_description: str = Field(default="Interactive user perturbation", max_length=250)
+
+@app.get("/api/simulator/presets")
+def get_simulator_presets():
+    return {"presets": counterfactual.COUNTERFACTUAL_PRESETS}
+
+@app.post("/api/simulator/suggest")
+def get_simulator_suggestions(payload: SimulatorSuggestRequest):
+    return {"suggestions": counterfactual.generate_quick_mutations(payload.text)}
+
+@app.post("/api/simulator/run", response_model=counterfactual.CounterfactualResult)
+async def run_counterfactual_simulation_endpoint(payload: SimulatorRunRequest):
+    """Executes counterfactual what-if simulation comparing original vs perturbed syntax."""
+    result = await asyncio.to_thread(
+        counterfactual.run_counterfactual_simulation,
+        payload.base_text,
+        payload.mutated_text,
+        run_syntactic_analysis,
+        payload.mutation_type,
+        payload.mutation_description,
+    )
+    return result
+
 @app.get("/api/benchmarks")
 def get_benchmarks():
     return {

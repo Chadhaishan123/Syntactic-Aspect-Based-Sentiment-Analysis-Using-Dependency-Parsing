@@ -13,6 +13,7 @@ import Insights from './pages/Insights';
 import Methodology from './pages/Methodology';
 import History from './pages/History';
 import Compare from './pages/Compare';
+import Simulator from './pages/Simulator';
 
 import './styles.css';
 
@@ -30,6 +31,7 @@ function AppLayout() {
             <Route path="/analyze" element={<Studio />} />
             <Route path="/studio" element={<Studio />} />
             <Route path="/compare" element={<Compare />} />
+            <Route path="/simulator" element={<Simulator />} />
             <Route path="/live" element={<LiveStream />} />
             <Route path="/batch" element={<BatchInspector />} />
             <Route path="/insights" element={<Insights />} />
