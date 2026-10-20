@@ -761,6 +761,45 @@ async def run_evaluation(payload: EvaluationRunRequest):
     )
     return report
 
+import comparison
+
+class CompareRequest(BaseModel):
+    name_a: str = Field(default="Product A", max_length=100)
+    texts_a: list[str] = Field(..., min_length=1, max_length=100)
+    name_b: str = Field(default="Product B", max_length=100)
+    texts_b: list[str] = Field(..., min_length=1, max_length=100)
+
+@app.get("/api/compare/presets")
+def get_comparison_presets():
+    return {
+        "presets": [
+            {
+                "key": key,
+                "title": p["title"],
+                "domain": p["domain"],
+                "name_a": p["name_a"],
+                "name_b": p["name_b"],
+                "sample_count_a": len(p["texts_a"]),
+                "sample_count_b": len(p["texts_b"]),
+                "preset_data": p
+            }
+            for key, p in comparison.COMPARISON_PRESETS.items()
+        ]
+    }
+
+@app.post("/api/compare", response_model=comparison.CompareResponse)
+async def run_product_comparison(payload: CompareRequest):
+    """Executes head-to-head syntactic aspect sentiment comparison between two entities."""
+    result = await asyncio.to_thread(
+        comparison.run_head_to_head_comparison,
+        payload.name_a,
+        payload.texts_a,
+        payload.name_b,
+        payload.texts_b,
+        run_syntactic_analysis,
+    )
+    return result
+
 @app.get("/api/benchmarks")
 def get_benchmarks():
     return {

@@ -12,12 +12,14 @@ import {
   X,
   Cpu,
   GitFork,
+  Swords,
 } from 'lucide-react';
 import { useRealtime } from '../context/RealtimeContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: LayoutDashboard },
   { to: '/analyze', label: 'Syntactic Studio', icon: Sparkles },
+  { to: '/compare', label: 'Battleground Duel', icon: Swords, badge: 'NEW' },
   { to: '/live', label: 'Live Stream', icon: Activity, badge: 'LIVE' },
   { to: '/batch', label: 'Batch & Benchmarks', icon: Layers },
   { to: '/insights', label: 'Aspect Intelligence', icon: BarChart3 },

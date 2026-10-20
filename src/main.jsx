@@ -12,6 +12,7 @@ import BatchInspector from './pages/BatchInspector';
 import Insights from './pages/Insights';
 import Methodology from './pages/Methodology';
 import History from './pages/History';
+import Compare from './pages/Compare';
 
 import './styles.css';
 
@@ -28,6 +29,7 @@ function AppLayout() {
             <Route path="/" element={<Overview />} />
             <Route path="/analyze" element={<Studio />} />
             <Route path="/studio" element={<Studio />} />
+            <Route path="/compare" element={<Compare />} />
             <Route path="/live" element={<LiveStream />} />
             <Route path="/batch" element={<BatchInspector />} />
             <Route path="/insights" element={<Insights />} />
