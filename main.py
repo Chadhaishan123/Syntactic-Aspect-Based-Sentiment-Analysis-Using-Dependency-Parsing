@@ -832,6 +832,26 @@ async def run_counterfactual_simulation_endpoint(payload: SimulatorRunRequest):
     )
     return result
 
+import reports
+
+class ReportGenerateRequest(BaseModel):
+    title: str = Field(default="Aspect-Based Sentiment Intelligence Brief", max_length=150)
+    organization: str = Field(default="SyntaxSense Universal Dependencies Analytics", max_length=150)
+    analyses: list[dict[str, Any]] = Field(default_factory=list)
+
+@app.post("/api/reports/generate", response_model=reports.ExecutiveReport)
+async def generate_report_endpoint(payload: ReportGenerateRequest):
+    """Synthesizes executive brief with SWOT analysis, aspect scores, and Markdown export."""
+    data = payload.analyses
+    if not data:
+        data = [a.model_dump() for a in get_recent_analyses(50)]
+    return await asyncio.to_thread(
+        reports.generate_executive_report,
+        data,
+        payload.title,
+        payload.organization,
+    )
+
 @app.get("/api/benchmarks")
 def get_benchmarks():
     return {

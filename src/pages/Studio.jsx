@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   Sparkles,
   Zap,
@@ -11,6 +12,8 @@ import {
   Compass,
   FileCode,
   Tag,
+  Share2,
+  Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DependencyTreeViewer from '../components/DependencyTreeViewer';
@@ -41,6 +44,8 @@ const PRESETS = [
 
 export default function Studio() {
   const { analyzeText, parseText } = useRealtime();
+  const location = useLocation();
+
   const [text, setText] = useState(
     'The battery life is really awful, but the vibrant display is stunning.'
   );
@@ -49,6 +54,7 @@ export default function Studio() {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [activeAspectId, setActiveAspectId] = useState(null);
+  const [copiedShare, setCopiedShare] = useState(false);
   const debounceTimerRef = useRef(null);
 
   // Trigger analysis (persisted & broadcast) or preview (non-persisting)
@@ -72,10 +78,23 @@ export default function Studio() {
     }
   };
 
-  // Initial load
+  // Initial load: inspect URL params or router location state
   useEffect(() => {
-    executeAnalysis();
-  }, []);
+    const searchParams = new URLSearchParams(location.search);
+    const queryParamText = searchParams.get('text');
+    const initialText = location.state?.text || queryParamText || text;
+    if (initialText !== text) {
+      setText(initialText);
+    }
+    executeAnalysis(initialText);
+  }, [location]);
+
+  const handleCopyShareLink = () => {
+    const url = `${window.location.origin}/analyze?text=${encodeURIComponent(text)}`;
+    navigator.clipboard.writeText(url);
+    setCopiedShare(true);
+    setTimeout(() => setCopiedShare(false), 2000);
+  };
 
   // Handle live typing debounce using non-persisting preview
   const handleTextChange = (e) => {
@@ -153,6 +172,14 @@ export default function Studio() {
           </div>
 
           <div className="editor-actions">
+            <button
+              className="btn-secondary btn-sm"
+              onClick={handleCopyShareLink}
+              title="Copy shareable permalink"
+            >
+              {copiedShare ? <Check size={14} className="text-emerald" /> : <Share2 size={14} />}
+              <span>{copiedShare ? 'Copied Permalink!' : 'Share'}</span>
+            </button>
             <button
               className="btn-secondary btn-sm"
               onClick={() => {

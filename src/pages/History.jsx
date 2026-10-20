@@ -10,14 +10,20 @@ import {
   Tag,
   AlertCircle,
   Sparkles,
+  FileText,
+  Share2,
+  Check
 } from 'lucide-react';
 import { useRealtime } from '../context/RealtimeContext';
+import ExecutiveReportModal from '../components/ExecutiveReportModal';
 
 export default function History() {
   const { analyses, deleteAnalysis, clearHistory } = useRealtime();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSentiment, setFilterSentiment] = useState('all');
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
 
   const filtered = analyses.filter((item) => {
     const matchesSearch =
@@ -66,6 +72,13 @@ export default function History() {
     dlAnchor.click();
   };
 
+  const handleCopyRowShare = (item) => {
+    const permalink = `${window.location.origin}/analyze?text=${encodeURIComponent(item.text)}`;
+    navigator.clipboard.writeText(permalink);
+    setCopiedId(item.id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   return (
     <div className="page-content">
       {/* Search & Actions Deck */}
@@ -104,6 +117,14 @@ export default function History() {
           </div>
 
           <div className="export-btn-group">
+            <button
+              className="btn-primary btn-sm"
+              onClick={() => setReportModalOpen(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              title="Generate Executive Intelligence Brief"
+            >
+              <FileText size={14} /> Executive Brief
+            </button>
             <button className="btn-secondary btn-sm" onClick={exportCSV} title="Export CSV">
               <Download size={14} /> CSV
             </button>
@@ -200,8 +221,15 @@ export default function History() {
                       <div className="row-actions">
                         <button
                           className="action-icon-btn btn-view"
+                          title="Share Permalinks"
+                          onClick={() => handleCopyRowShare(item)}
+                        >
+                          {copiedId === item.id ? <Check size={14} className="text-emerald" /> : <Share2 size={14} />}
+                        </button>
+                        <button
+                          className="action-icon-btn btn-view"
                           title="Inspect in Studio"
-                          onClick={() => navigate('/analyze')}
+                          onClick={() => navigate('/analyze', { state: { text: item.text } })}
                         >
                           <ExternalLink size={14} />
                         </button>
@@ -227,6 +255,13 @@ export default function History() {
           </table>
         </div>
       </div>
+
+      {/* Executive Report Modal */}
+      <ExecutiveReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        analyses={filtered}
+      />
     </div>
   );
 }
