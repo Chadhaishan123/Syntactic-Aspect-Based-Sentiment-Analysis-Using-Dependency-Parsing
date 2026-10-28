@@ -15,12 +15,23 @@ const ROUTE_INFO = {
 
 export default function Header({ onOpenMobileMenu }) {
   const location = useLocation();
-  const { streamingActive, toggleStreaming, lastEvent, connected, latency } = useRealtime();
+  const {
+    streamingActive,
+    toggleStreaming,
+    lastEvent,
+    connected,
+    latency,
+    alerts = [],
+    unreadAlertsCount = 0,
+    acknowledgeAlert,
+    clearAlerts,
+    injectReview
+  } = useRealtime();
   const [showInjectModal, setShowInjectModal] = useState(false);
+  const [showAlertsDropdown, setShowAlertsDropdown] = useState(false);
   const [injectText, setInjectText] = useState('');
   const [injectSource, setInjectSource] = useState('Live Broadcaster');
   const [injecting, setInjecting] = useState(false);
-  const { injectReview } = useRealtime();
 
   const current = ROUTE_INFO[location.pathname] || {
     title: 'SyntaxSense ABSA',
@@ -58,6 +69,65 @@ export default function Header({ onOpenMobileMenu }) {
       </div>
 
       <div className="header-actions">
+        {/* Smart Alerts Bell */}
+        <div className="alerts-bell-wrapper">
+          <button
+            className={`header-bell-btn ${unreadAlertsCount > 0 ? 'bell-has-unread' : ''}`}
+            onClick={() => setShowAlertsDropdown(!showAlertsDropdown)}
+            title="Aspect-Specific Smart Alerts"
+            aria-label="Smart Alerts"
+          >
+            <Bell size={16} />
+            {unreadAlertsCount > 0 && (
+              <span className="bell-badge">{unreadAlertsCount > 9 ? '9+' : unreadAlertsCount}</span>
+            )}
+          </button>
+
+          {showAlertsDropdown && (
+            <div className="alerts-dropdown-panel" onClick={(e) => e.stopPropagation()}>
+              <div className="dropdown-header">
+                <div className="dropdown-title-group">
+                  <span className="dropdown-pre">MONITORING ENGINE</span>
+                  <strong>Smart Sentiment Alerts ({alerts.length})</strong>
+                </div>
+                {alerts.length > 0 && (
+                  <button className="btn-clear-alerts" onClick={clearAlerts}>
+                    Clear All
+                  </button>
+                )}
+              </div>
+
+              <div className="dropdown-alerts-list">
+                {alerts.length === 0 ? (
+                  <div className="dropdown-empty">
+                    <CheckCircle size={22} className="text-emerald" />
+                    <p>All aspects stable. No active sentiment spikes or emerging complaints.</p>
+                  </div>
+                ) : (
+                  alerts.slice(0, 6).map((alt) => (
+                    <div
+                      key={alt.id}
+                      className={`dropdown-alert-item alert-${alt.severity} ${
+                        alt.acknowledged ? 'alert-ack' : ''
+                      }`}
+                      onClick={() => acknowledgeAlert(alt.id)}
+                    >
+                      <div className="alt-top-row">
+                        <span className={`alt-severity-tag tag-${alt.severity}`}>
+                          {alt.alert_type === 'spike' ? 'NEGATIVE SPIKE' : 'EMERGING ISSUE'}
+                        </span>
+                        <span className="alt-metric">{alt.metric_label}</span>
+                      </div>
+                      <div className="alt-title">{alt.title}</div>
+                      <p className="alt-desc">{alt.message}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Stream Simulation Toggle */}
         <button
           className={`stream-toggle-btn ${streamingActive ? 'stream-active' : 'stream-paused'}`}

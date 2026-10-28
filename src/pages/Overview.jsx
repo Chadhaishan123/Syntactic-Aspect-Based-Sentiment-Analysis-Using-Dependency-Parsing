@@ -71,6 +71,9 @@ export default function Overview() {
             <NavLink to="/analyze" className="btn-primary">
               Open Syntactic Studio <ChevronRight size={16} />
             </NavLink>
+            <NavLink to="/lab" className="btn-secondary">
+              Syntax Impact Lab <ChevronRight size={16} />
+            </NavLink>
             <NavLink to="/live" className="btn-secondary">
               View Live Stream <Activity size={16} />
             </NavLink>
@@ -175,6 +178,53 @@ export default function Overview() {
             </span>
           </div>
         </motion.div>
+      </section>
+
+      {/* Standout Innovation Highlights */}
+      <section className="innovation-deck-grid">
+        <NavLink to="/analyze" className="innovation-deck-card">
+          <div className="deck-card-top">
+            <span className="deck-card-badge badge-cyan">STANDOUT #1</span>
+            <span className="deck-card-tag">Dependency Arcs</span>
+          </div>
+          <h4 className="deck-card-title">Aspect-to-Opinion Path Explorer</h4>
+          <p className="deck-card-desc">
+            Click any aspect (e.g. <code>battery</code>) to trace animated syntactic traversal arcs to evaluative modifiers.
+          </p>
+        </NavLink>
+
+        <NavLink to="/lab" className="innovation-deck-card">
+          <div className="deck-card-top">
+            <span className="deck-card-badge badge-purple">STANDOUT #4</span>
+            <span className="deck-card-tag">+20.8% Macro-F1</span>
+          </div>
+          <h4 className="deck-card-title">Syntax Impact Lab</h4>
+          <p className="deck-card-desc">
+            Benchmark naive Bag-of-Words against Universal Dependencies with real-time syntactic feature ablation toggles.
+          </p>
+        </NavLink>
+
+        <NavLink to="/live" className="innovation-deck-card">
+          <div className="deck-card-top">
+            <span className="deck-card-badge badge-rose">STANDOUT #2 & #5</span>
+            <span className="deck-card-tag">Real-Time</span>
+          </div>
+          <h4 className="deck-card-title">Smart Alerts & Emerging Complaints</h4>
+          <p className="deck-card-desc">
+            Real-time spike detector that alerts on surges for specific features and uncovers emerging complaint topics.
+          </p>
+        </NavLink>
+
+        <NavLink to="/analyze" className="innovation-deck-card">
+          <div className="deck-card-top">
+            <span className="deck-card-badge badge-emerald">STANDOUT #3</span>
+            <span className="deck-card-tag">Explainable AI</span>
+          </div>
+          <h4 className="deck-card-title">Why This Prediction? Audit</h4>
+          <p className="deck-card-desc">
+            Full syntactic explainability breakdown: grammar rules, negation flips, confidence math, and counterfactuals.
+          </p>
+        </NavLink>
       </section>
 
       {/* Main Charts & Matrix Section */}

@@ -16,6 +16,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 import live_sources
+import alerts_engine
+import syntax_lab
 
 try:
     import spacy
@@ -210,6 +212,23 @@ class ConnectionManager:
             self.disconnect(dead_conn)
 
 ws_manager = ConnectionManager()
+
+async def dispatch_analysis_with_alerts(item: Analysis) -> list[alerts_engine.SmartAlert]:
+    save_analysis(item)
+    await ws_manager.broadcast({
+        "type": "NEW_ANALYSIS",
+        "data": item.model_dump(mode="json")
+    })
+    new_alerts = alerts_engine.monitor.process_analysis(
+        item.text,
+        [{"term": a.term, "sentiment": a.sentiment} for a in item.aspects]
+    )
+    for alt in new_alerts:
+        await ws_manager.broadcast({
+            "type": "SMART_ALERT",
+            "data": alt.model_dump(mode="json")
+        })
+    return new_alerts
 
 # ---------------------------------------------------------
 # Core Syntactic Dependency Parsing Algorithm
@@ -555,8 +574,7 @@ async def poll_source(status: live_sources.SourceStatus, fetcher) -> int:
             )
             if not item.aspects:
                 continue  # no aspect-opinion pair found; not useful for ABSA
-            save_analysis(item)
-            await ws_manager.broadcast({"type": "NEW_ANALYSIS", "data": item.model_dump(mode="json")})
+            await dispatch_analysis_with_alerts(item)
             ingested += 1
             if ingested >= MAX_SENTENCES_PER_POLL:
                 break
@@ -610,12 +628,7 @@ def parse_only(payload: AnalyzeRequest):
 @app.post("/api/analyze", response_model=Analysis, status_code=201)
 async def create_analysis(payload: AnalyzeRequest):
     item = run_syntactic_analysis(payload.text.strip(), payload.source)
-    save_analysis(item)
-    # Real-time WebSocket broadcast to all connected viewers
-    await ws_manager.broadcast({
-        "type": "NEW_ANALYSIS",
-        "data": item.model_dump(mode="json")
-    })
+    await dispatch_analysis_with_alerts(item)
     return item
 
 @app.post("/api/batch", status_code=200)
@@ -624,13 +637,8 @@ async def batch_analysis(payload: BatchAnalyzeRequest):
     for txt in payload.texts:
         if txt.strip():
             item = run_syntactic_analysis(txt.strip(), payload.source, origin="batch")
-            save_analysis(item)
+            await dispatch_analysis_with_alerts(item)
             results.append(item)
-            # Live broadcast
-            await ws_manager.broadcast({
-                "type": "NEW_ANALYSIS",
-                "data": item.model_dump(mode="json")
-            })
     return {"processed": len(results), "items": results}
 
 @app.get("/api/analyses", response_model=list[Analysis])
@@ -714,11 +722,7 @@ def get_live_feed(limit: int = 15):
 @app.post("/api/stream/inject")
 async def inject_stream_review(payload: StreamInjectRequest):
     item = run_syntactic_analysis(payload.text.strip(), source=payload.source, origin="manual")
-    save_analysis(item)
-    await ws_manager.broadcast({
-        "type": "NEW_ANALYSIS",
-        "data": item.model_dump(mode="json")
-    })
+    await dispatch_analysis_with_alerts(item)
     return item
 
 @app.post("/api/stream/toggle")
@@ -1009,20 +1013,67 @@ def get_benchmarks():
     }
 
 # ---------------------------------------------------------
+# Feature: Real-Time Smart Alerts & Emerging Complaints Endpoints
+# ---------------------------------------------------------
+@app.get("/api/alerts/active")
+def get_active_smart_alerts():
+    return {"alerts": [a.model_dump() for a in alerts_engine.monitor.get_active_alerts()]}
+
+@app.post("/api/alerts/acknowledge/{alert_id}")
+def acknowledge_smart_alert(alert_id: str):
+    success = alerts_engine.monitor.acknowledge_alert(alert_id)
+    return {"status": "ok" if success else "not_found", "id": alert_id}
+
+@app.post("/api/alerts/clear")
+def clear_all_smart_alerts():
+    alerts_engine.monitor.clear_alerts()
+    return {"status": "cleared"}
+
+# ---------------------------------------------------------
+# Feature: Syntax Impact Lab (Model Comparison & Ablation)
+# ---------------------------------------------------------
+class LabCompareRequest(BaseModel):
+    negation_handling: bool = True
+    coordination_chains: bool = True
+    compound_noun_resolution: bool = True
+    dependency_path_filtering: bool = True
+
+@app.get("/api/lab/benchmarks")
+def get_lab_benchmarks():
+    return {"benchmarks": syntax_lab.SYNTAX_LAB_BENCHMARKS}
+
+@app.post("/api/lab/compare", response_model=syntax_lab.ComparisonReport)
+async def run_lab_comparison_endpoint(payload: LabCompareRequest):
+    """Executes Syntax Impact Lab comparison comparing baseline vs dependency-enhanced model."""
+    ablation = syntax_lab.AblationConfig(
+        negation_handling=payload.negation_handling,
+        coordination_chains=payload.coordination_chains,
+        compound_noun_resolution=payload.compound_noun_resolution,
+        dependency_path_filtering=payload.dependency_path_filtering,
+    )
+    return await asyncio.to_thread(
+        syntax_lab.run_model_comparison_lab,
+        run_syntactic_analysis,
+        ablation,
+    )
+
+# ---------------------------------------------------------
 # WebSocket Live Endpoint
 # ---------------------------------------------------------
 @app.websocket("/ws/live")
 async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)
     try:
-        # Send initial handshake with recent analyses
+        # Send initial handshake with recent analyses and active smart alerts
         recent = saved_analyses(10)
+        active_alts = alerts_engine.monitor.get_active_alerts()
         await websocket.send_json({
             "type": "INIT_STATE",
             "data": [r.model_dump(mode="json") for r in recent],
             "client_count": len(ws_manager.active_connections),
             "ingestion_active": INGESTION_ACTIVE,
             "sources": sources_public(),
+            "active_alerts": [a.model_dump(mode="json") for a in active_alts[:10]],
         })
         await ws_manager.broadcast({"type": "CLIENT_COUNT", "count": len(ws_manager.active_connections)})
         while True:
@@ -1036,11 +1087,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 src = msg.get("source", "Realtime WebSocket Client")
                 if text:
                     item = run_syntactic_analysis(text, source=src)
-                    save_analysis(item)
-                    await ws_manager.broadcast({
-                        "type": "NEW_ANALYSIS",
-                        "data": item.model_dump(mode="json")
-                    })
+                    await dispatch_analysis_with_alerts(item)
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
     except Exception:

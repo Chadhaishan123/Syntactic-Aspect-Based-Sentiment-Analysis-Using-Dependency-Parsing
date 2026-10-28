@@ -5,6 +5,7 @@ const RealtimeContext = createContext(null);
 
 export function RealtimeProvider({ children }) {
   const [analyses, setAnalyses] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [connected, setConnected] = useState(false);
   const [latency, setLatency] = useState(null); // WebSocket round-trip (ms), measured
   const [activeClients, setActiveClients] = useState(1);
@@ -18,9 +19,10 @@ export function RealtimeProvider({ children }) {
   // Fetch initial state via REST
   const fetchInitialState = useCallback(async () => {
     try {
-      const [resAnalyses, resHealth] = await Promise.all([
+      const [resAnalyses, resHealth, resAlerts] = await Promise.all([
         fetch(`${API_BASE}/api/analyses?limit=60`),
-        fetch(`${API_BASE}/api/health`)
+        fetch(`${API_BASE}/api/health`),
+        fetch(`${API_BASE}/api/alerts/active`).catch(() => null)
       ]);
       if (resAnalyses.ok) {
         const data = await resAnalyses.json();
@@ -31,6 +33,12 @@ export function RealtimeProvider({ children }) {
         setStreamingActive(health.realtime_streaming ?? true);
         setSources(health.sources || []);
         setPollInterval(health.poll_interval_seconds ?? null);
+      }
+      if (resAlerts && resAlerts.ok) {
+        const alertsData = await resAlerts.json();
+        if (alertsData.alerts) {
+          setAlerts(alertsData.alerts);
+        }
       }
     } catch (err) {
       console.warn('Initial fetch error:', err);
@@ -81,6 +89,12 @@ export function RealtimeProvider({ children }) {
             if (msg.client_count) setActiveClients(msg.client_count);
             if (msg.sources) setSources(msg.sources);
             if (typeof msg.ingestion_active === 'boolean') setStreamingActive(msg.ingestion_active);
+            if (msg.active_alerts && msg.active_alerts.length) {
+              setAlerts(msg.active_alerts);
+            }
+          } else if (msg.type === 'SMART_ALERT') {
+            const newAlert = msg.data;
+            setAlerts((prev) => [newAlert, ...prev.filter((a) => a.id !== newAlert.id)].slice(0, 40));
           } else if (msg.type === 'SOURCE_STATUS') {
             setSources(msg.data || []);
           } else if (msg.type === 'INGESTION_STATE') {
@@ -194,6 +208,28 @@ export function RealtimeProvider({ children }) {
     setAnalyses([]);
   };
 
+  const acknowledgeAlert = async (id) => {
+    try {
+      await fetch(`${API_BASE}/api/alerts/acknowledge/${id}`, { method: 'POST' });
+    } catch (e) {
+      console.warn(e);
+    }
+    setAlerts((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, acknowledged: true } : a))
+    );
+  };
+
+  const clearAlerts = async () => {
+    try {
+      await fetch(`${API_BASE}/api/alerts/clear`, { method: 'POST' });
+    } catch (e) {
+      console.warn(e);
+    }
+    setAlerts([]);
+  };
+
+  const unreadAlertsCount = alerts.filter((a) => !a.acknowledged).length;
+
   // Live aggregated analytics derived in real time
   const totalAnalyzed = analyses.length;
   const allAspects = analyses.flatMap((a) => a.aspects || []);
@@ -222,6 +258,10 @@ export function RealtimeProvider({ children }) {
     <RealtimeContext.Provider
       value={{
         analyses,
+        alerts,
+        unreadAlertsCount,
+        acknowledgeAlert,
+        clearAlerts,
         connected,
         latency,
         activeClients,

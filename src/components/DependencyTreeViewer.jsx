@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Eye, Info, Sparkles, Zap, HelpCircle } from 'lucide-react';
+import { Eye, Info, Sparkles, Zap, HelpCircle, GitFork, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function DependencyTreeViewer({
   tokens = [],
@@ -7,6 +7,7 @@ export default function DependencyTreeViewer({
   aspects = [],
   activeAspectId = null,
   onSelectAspect = () => {},
+  onOpenWhy = null,
 }) {
   const [hoveredToken, setHoveredToken] = useState(null);
   const [highlightPathsOnly, setHighlightPathsOnly] = useState(false);
@@ -14,7 +15,7 @@ export default function DependencyTreeViewer({
 
   // Find active aspect details
   const activeAspect = useMemo(
-    () => aspects.find((a) => a.id === activeAspectId),
+    () => aspects.find((a) => a.id === activeAspectId) || aspects[0] || null,
     [aspects, activeAspectId]
   );
 
@@ -34,11 +35,22 @@ export default function DependencyTreeViewer({
     return new Set(activeAspect.opinion_token_ids || []);
   }, [activeAspect]);
 
+  // Construct structured step-by-step path breakdown
+  const pathStepNodes = useMemo(() => {
+    if (!activeAspect || !activeAspect.shortest_path_nodes || activeAspect.shortest_path_nodes.length === 0) {
+      return [];
+    }
+    return activeAspect.shortest_path_nodes.map((nodeId) => {
+      const tok = tokens.find((t) => t.id === nodeId);
+      return tok || { id: nodeId, text: `#${nodeId}`, pos: 'UNK', dep: 'dep' };
+    });
+  }, [activeAspect, tokens]);
+
   // Dimensions & layout calculations
-  const TOKEN_WIDTH = 84;
-  const START_X = 50;
+  const TOKEN_WIDTH = 88;
+  const START_X = 54;
   const BASE_Y = 180;
-  const totalWidth = Math.max(860, tokens.length * TOKEN_WIDTH + 100);
+  const totalWidth = Math.max(880, tokens.length * TOKEN_WIDTH + 110);
 
   // Calculate coordinates for each token
   const tokenCoords = useMemo(() => {
@@ -67,6 +79,16 @@ export default function DependencyTreeViewer({
 
   const defaultPosColor = { bg: 'rgba(148, 163, 184, 0.15)', text: '#94a3b8', border: 'rgba(148, 163, 184, 0.3)' };
 
+  const handleTokenClick = (tok) => {
+    // If token is an aspect, select it directly
+    const foundAspect = aspects.find((a) =>
+      a.aspect_token_ids?.includes(tok.id) || a.opinion_token_ids?.includes(tok.id) || a.id === tok.aspect_id
+    );
+    if (foundAspect) {
+      onSelectAspect(foundAspect.id);
+    }
+  };
+
   if (!tokens || tokens.length === 0) {
     return (
       <div className="empty-tree-state">
@@ -78,10 +100,39 @@ export default function DependencyTreeViewer({
 
   return (
     <div className="dependency-viewer-container">
+      {/* Path Explorer Aspect Switcher Strip */}
+      {aspects && aspects.length > 0 && (
+        <div className="path-explorer-aspect-strip">
+          <div className="path-strip-title">
+            <GitFork size={14} className="text-purple" />
+            <span>Aspect-to-Opinion Path Explorer:</span>
+          </div>
+          <div className="path-aspect-chips">
+            {aspects.map((asp) => {
+              const isSelected = (activeAspect?.id === asp.id);
+              return (
+                <button
+                  key={asp.id}
+                  className={`path-aspect-chip ${isSelected ? 'chip-active' : ''}`}
+                  onClick={() => onSelectAspect(asp.id)}
+                  title={`Click to trace dependency path for ${asp.term}`}
+                >
+                  <span className={`chip-dot dot-${asp.sentiment}`} />
+                  <strong>{asp.term}</strong>
+                  <span className="chip-opinion">↔ “{asp.opinion}”</span>
+                  <span className="chip-conf">{asp.confidence}%</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Tree Toolbar Controls */}
       <div className="tree-toolbar">
         <div className="toolbar-left">
           <span className="live-tag">
-            <Zap size={14} className="pulse-fast" /> Universal Dependency Parse (spaCy)
+            <Zap size={14} className="pulse-fast" /> Universal Dependency Parse (spaCy UD 2.0)
           </span>
           <span className="token-count-tag">{tokens.length} tokens · {arcs.length} syntactic arcs</span>
         </div>
@@ -100,7 +151,7 @@ export default function DependencyTreeViewer({
               checked={highlightPathsOnly}
               onChange={(e) => setHighlightPathsOnly(e.target.checked)}
             />
-            <span>Highlight Paths Only</span>
+            <span>Isolate Traversal Arcs</span>
           </label>
         </div>
       </div>
@@ -110,8 +161,8 @@ export default function DependencyTreeViewer({
         <svg
           className="dependency-svg"
           width={totalWidth}
-          height={BASE_Y + 90}
-          viewBox={`0 0 ${totalWidth} ${BASE_Y + 90}`}
+          height={BASE_Y + 95}
+          viewBox={`0 0 ${totalWidth} ${BASE_Y + 95}`}
         >
           <defs>
             <marker
@@ -134,7 +185,7 @@ export default function DependencyTreeViewer({
               markerHeight="7"
               orient="auto-start-reverse"
             >
-              <path d="M 0 1 L 10 5 L 0 9 z" fill="#a855f7" />
+              <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
             </marker>
             <marker
               id="arrow-aspect"
@@ -149,9 +200,13 @@ export default function DependencyTreeViewer({
             </marker>
             <linearGradient id="highlight-grad" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#38bdf8" />
-              <stop offset="50%" stopColor="#a855f7" />
+              <stop offset="50%" stopColor="#c084fc" />
               <stop offset="100%" stopColor="#f43f5e" />
             </linearGradient>
+            <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feComposite in="SourceGraphic" in2="blur" operator="over" />
+            </filter>
           </defs>
 
           {/* Render Dependency Arcs */}
@@ -198,7 +253,7 @@ export default function DependencyTreeViewer({
                       ? '#a855f7'
                       : 'rgba(100, 116, 139, 0.45)'
                   }
-                  strokeWidth={isInActivePath ? 3 : arc.is_aspect_path ? 2.2 : 1.4}
+                  strokeWidth={isInActivePath ? 3.2 : arc.is_aspect_path ? 2.2 : 1.4}
                   strokeDasharray={arc.label === 'punct' ? '3 3' : 'none'}
                   markerEnd={
                     isInActivePath
@@ -207,6 +262,7 @@ export default function DependencyTreeViewer({
                       ? 'url(#arrow-aspect)'
                       : 'url(#arrow-regular)'
                   }
+                  filter={isInActivePath ? 'url(#glow)' : undefined}
                 />
 
                 {/* Arc relation tag pill */}
@@ -225,7 +281,7 @@ export default function DependencyTreeViewer({
                         ? '#818cf8'
                         : 'rgba(148, 163, 184, 0.25)'
                     }
-                    strokeWidth={isInActivePath ? 1.5 : 1}
+                    strokeWidth={isInActivePath ? 1.6 : 1}
                   />
                   <text
                     x="0"
@@ -260,22 +316,26 @@ export default function DependencyTreeViewer({
               <g
                 key={`tok-${token.id}`}
                 transform={`translate(${coord.x}, ${coord.y})`}
-                className={`token-node ${isHovered ? 'node-hovered' : ''}`}
+                className={`token-node ${isHovered ? 'node-hovered' : ''} ${
+                  isInPath ? 'node-in-path' : ''
+                }`}
                 onMouseEnter={() => setHoveredToken(token)}
                 onMouseLeave={() => setHoveredToken(null)}
+                onClick={() => handleTokenClick(token)}
+                style={{ cursor: 'pointer' }}
               >
-                {/* Node highlight ring if part of aspect or opinion */}
+                {/* Node highlight ring if part of aspect, opinion, or shortest path */}
                 {(isAspectTarget || isOpinionTarget || isInPath) && (
                   <circle
                     cx="0"
                     cy="-22"
-                    r="18"
+                    r={isAspectTarget || isOpinionTarget ? '19' : '16'}
                     fill={
                       isAspectTarget
-                        ? 'rgba(56, 189, 248, 0.2)'
+                        ? 'rgba(56, 189, 248, 0.25)'
                         : isOpinionTarget
-                        ? 'rgba(244, 63, 94, 0.2)'
-                        : 'rgba(168, 85, 247, 0.15)'
+                        ? 'rgba(244, 63, 94, 0.25)'
+                        : 'rgba(168, 85, 247, 0.18)'
                     }
                     stroke={
                       isAspectTarget
@@ -284,7 +344,7 @@ export default function DependencyTreeViewer({
                         ? '#f43f5e'
                         : '#c084fc'
                     }
-                    strokeWidth="1.5"
+                    strokeWidth={isAspectTarget || isOpinionTarget ? '2' : '1.5'}
                     className="pulse-node"
                   />
                 )}
@@ -390,20 +450,76 @@ export default function DependencyTreeViewer({
         </div>
       )}
 
-      {/* Legend & Syntactic Shortest Path Bar */}
+      {/* Step-by-Step Syntactic Traversal Card */}
+      {activeAspect && (
+        <div className="path-traversal-card">
+          <div className="path-traversal-header">
+            <div className="traversal-title-group">
+              <span className="traversal-tag">ACTIVE SYNTACTIC TRAVERSAL ROUTE</span>
+              <h4 className="traversal-title">
+                {activeAspect.term} ↔ “{activeAspect.opinion}”
+              </h4>
+            </div>
+            <div className="traversal-actions">
+              <span
+                className={`polarity-pill ${
+                  activeAspect.sentiment === 'positive'
+                    ? 'pill-positive'
+                    : activeAspect.sentiment === 'negative'
+                    ? 'pill-negative'
+                    : 'pill-neutral'
+                }`}
+              >
+                {activeAspect.sentiment.toUpperCase()} · {activeAspect.confidence}%
+              </span>
+              {onOpenWhy && (
+                <button
+                  className="btn-why-prediction"
+                  onClick={() => onOpenWhy(activeAspect)}
+                  title="Open full syntactic explainability report"
+                >
+                  <HelpCircle size={14} />
+                  <span>Why This Prediction?</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="path-step-chain">
+            {pathStepNodes.map((stepNode, idx) => (
+              <React.Fragment key={`step-${stepNode.id}-${idx}`}>
+                <div
+                  className={`path-node-chip ${
+                    activeAspectTokens.has(stepNode.id)
+                      ? 'node-chip-aspect'
+                      : activeOpinionTokens.has(stepNode.id)
+                      ? 'node-chip-opinion'
+                      : 'node-chip-bridge'
+                  }`}
+                >
+                  <span className="node-step-pos">{stepNode.pos}</span>
+                  <strong>{stepNode.text}</strong>
+                  <span className="node-step-dep">{stepNode.dep}</span>
+                </div>
+                {idx < pathStepNodes.length - 1 && (
+                  <div className="path-chain-arrow">
+                    <ArrowRight size={14} className="text-purple" />
+                  </div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Legend */}
       <div className="tree-footer">
         <div className="legend-items">
-          <span className="legend-item"><i className="legend-dot aspect-dot" /> Aspect Node</span>
-          <span className="legend-item"><i className="legend-dot opinion-dot" /> Opinion Node</span>
+          <span className="legend-item"><i className="legend-dot aspect-dot" /> Aspect Node (Noun Head)</span>
+          <span className="legend-item"><i className="legend-dot opinion-dot" /> Opinion Node (Modifier)</span>
           <span className="legend-item"><i className="legend-dot path-dot" /> Shortest Dependency Path</span>
-          <span className="legend-item"><i className="legend-dot neg-dot" /> Negation Inversion</span>
+          <span className="legend-item"><i className="legend-dot neg-dot" /> Negation Inversion (neg)</span>
         </div>
-        {activeAspect && (
-          <div className="active-path-display">
-            <span className="path-label">Syntactic Traversal:</span>
-            <code>{activeAspect.dependency_path}</code>
-          </div>
-        )}
       </div>
     </div>
   );

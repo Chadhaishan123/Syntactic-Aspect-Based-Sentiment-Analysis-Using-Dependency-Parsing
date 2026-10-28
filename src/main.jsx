@@ -18,6 +18,7 @@ import AspectQA from './pages/AspectQA';
 import SarcasmDetector from './pages/SarcasmDetector';
 import TaxonomyStudio from './pages/TaxonomyStudio';
 import ReviewMining from './pages/ReviewMining';
+import SyntaxLab from './pages/SyntaxLab';
 
 import './styles.css';
 
@@ -33,6 +34,8 @@ function AppLayout() {
           <Routes>
             <Route path="/" element={<Overview />} />
             <Route path="/mining" element={<ReviewMining />} />
+            <Route path="/lab" element={<SyntaxLab />} />
+            <Route path="/syntax-lab" element={<SyntaxLab />} />
             <Route path="/analyze" element={<Studio />} />
             <Route path="/studio" element={<Studio />} />
             <Route path="/compare" element={<Compare />} />

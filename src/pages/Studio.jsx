@@ -13,10 +13,12 @@ import {
   FileCode,
   Tag,
   Share2,
-  Check
+  Check,
+  HelpCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DependencyTreeViewer from '../components/DependencyTreeViewer';
+import WhyPredictionModal from '../components/WhyPredictionModal';
 import { useRealtime } from '../context/RealtimeContext';
 
 const PRESETS = [
@@ -54,6 +56,7 @@ export default function Studio() {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [activeAspectId, setActiveAspectId] = useState(null);
+  const [selectedWhyAspect, setSelectedWhyAspect] = useState(null);
   const [copiedShare, setCopiedShare] = useState(false);
   const debounceTimerRef = useRef(null);
 
@@ -221,6 +224,7 @@ export default function Studio() {
           aspects={result?.aspects || []}
           activeAspectId={activeAspectId}
           onSelectAspect={(id) => setActiveAspectId(id)}
+          onOpenWhy={(asp) => setSelectedWhyAspect(asp)}
         />
       </section>
 
@@ -278,6 +282,17 @@ export default function Studio() {
                       <span className="click-to-focus">
                         {isActive ? '● Currently focused in tree' : 'Click to highlight in dependency tree'}
                       </span>
+                      <button
+                        className="btn-why-chip"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedWhyAspect(asp);
+                        }}
+                        title="Audit why this prediction was made"
+                      >
+                        <HelpCircle size={12} />
+                        <span>Why This Prediction?</span>
+                      </button>
                     </div>
                   </motion.div>
                 );
@@ -359,6 +374,17 @@ export default function Studio() {
           </div>
         </div>
       </section>
+
+      {/* Explainable Why This Prediction Modal */}
+      {selectedWhyAspect && (
+        <WhyPredictionModal
+          aspect={selectedWhyAspect}
+          text={text}
+          tokens={result?.tokens || []}
+          arcs={result?.arcs || []}
+          onClose={() => setSelectedWhyAspect(null)}
+        />
+      )}
     </div>
   );
 }
