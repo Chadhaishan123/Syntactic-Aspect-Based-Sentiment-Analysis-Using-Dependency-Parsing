@@ -56,7 +56,7 @@ export default function Overview() {
           <div className="hero-pill">
             <span className="live-indicator-dot" />
             <span>
-              Live ingestion · {healthySources}/{sources.length || 2} sources healthy · Hacker News + Mastodon
+              Universal Dependency ABSA · spaCy UD 2.0 Engine · Real-Time Telemetry
             </span>
           </div>
           <h2 className="hero-headline">
@@ -69,13 +69,13 @@ export default function Overview() {
           </p>
           <div className="hero-ctas">
             <NavLink to="/analyze" className="btn-primary">
-              Open Syntactic Studio <ChevronRight size={16} />
+              Open Dependency Studio <ChevronRight size={16} />
             </NavLink>
-            <NavLink to="/lab" className="btn-secondary">
-              Syntax Impact Lab <ChevronRight size={16} />
+            <NavLink to="/compare" className="btn-secondary">
+              Comparative Benchmark <ChevronRight size={16} />
             </NavLink>
-            <NavLink to="/live" className="btn-secondary">
-              View Live Stream <Activity size={16} />
+            <NavLink to="/aspect-qa" className="btn-secondary">
+              Aspect-QA Engine <ChevronRight size={16} />
             </NavLink>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function Overview() {
       <section className="innovation-deck-grid">
         <NavLink to="/analyze" className="innovation-deck-card">
           <div className="deck-card-top">
-            <span className="deck-card-badge badge-cyan">STANDOUT #1</span>
+            <span className="deck-card-badge badge-cyan">STUDIO</span>
             <span className="deck-card-tag">Dependency Arcs</span>
           </div>
           <h4 className="deck-card-title">Aspect-to-Opinion Path Explorer</h4>
@@ -193,31 +193,31 @@ export default function Overview() {
           </p>
         </NavLink>
 
-        <NavLink to="/lab" className="innovation-deck-card">
+        <NavLink to="/compare" className="innovation-deck-card">
           <div className="deck-card-top">
-            <span className="deck-card-badge badge-purple">STANDOUT #4</span>
-            <span className="deck-card-tag">+20.8% Macro-F1</span>
+            <span className="deck-card-badge badge-purple">BENCHMARK</span>
+            <span className="deck-card-tag">Radar & Margin</span>
           </div>
-          <h4 className="deck-card-title">Syntax Impact Lab</h4>
+          <h4 className="deck-card-title">Comparative Aspect Analysis</h4>
           <p className="deck-card-desc">
-            Benchmark naive Bag-of-Words against Universal Dependencies with real-time syntactic feature ablation toggles.
+            Side-by-side product benchmarking aligning shared aspect dimensions, net lead margins, and quote evidence.
           </p>
         </NavLink>
 
-        <NavLink to="/live" className="innovation-deck-card">
+        <NavLink to="/aspect-qa" className="innovation-deck-card">
           <div className="deck-card-top">
-            <span className="deck-card-badge badge-rose">STANDOUT #2 & #5</span>
-            <span className="deck-card-tag">Real-Time</span>
+            <span className="deck-card-badge badge-rose">CONVERSATIONAL</span>
+            <span className="deck-card-tag">Aspect Q&A</span>
           </div>
-          <h4 className="deck-card-title">Smart Alerts & Emerging Complaints</h4>
+          <h4 className="deck-card-title">Aspect-QA Engine</h4>
           <p className="deck-card-desc">
-            Real-time spike detector that alerts on surges for specific features and uncovers emerging complaint topics.
+            Natural language query interface that synthesizes direct evidence-grounded answers from dependency parse trees.
           </p>
         </NavLink>
 
         <NavLink to="/analyze" className="innovation-deck-card">
           <div className="deck-card-top">
-            <span className="deck-card-badge badge-emerald">STANDOUT #3</span>
+            <span className="deck-card-badge badge-emerald">AUDITING</span>
             <span className="deck-card-tag">Explainable AI</span>
           </div>
           <h4 className="deck-card-title">Why This Prediction? Audit</h4>
@@ -284,8 +284,8 @@ export default function Overview() {
               <span className="panel-pre-title">SYNTACTIC AGGREGATION</span>
               <h3 className="panel-title">Dominant Aspect Mentions</h3>
             </div>
-            <NavLink to="/insights" className="panel-link">
-              View Matrix <ArrowUpRight size={14} />
+            <NavLink to="/analyze" className="panel-link">
+              Open Studio <ArrowUpRight size={14} />
             </NavLink>
           </div>
           <div className="aspect-bars-list">
@@ -322,10 +322,10 @@ export default function Overview() {
         <div className="panel-header">
           <div>
             <span className="panel-pre-title">INCOMING REAL-TIME SIGNALS</span>
-            <h3 className="panel-title">Live Ingested Reviews</h3>
+            <h3 className="panel-title">Recent Ingested Reviews</h3>
           </div>
-          <NavLink to="/live" className="btn-secondary btn-sm">
-            Open Full Stream <ChevronRight size={14} />
+          <NavLink to="/analyze" className="btn-secondary btn-sm">
+            Analyze in Studio <ChevronRight size={14} />
           </NavLink>
         </div>
 

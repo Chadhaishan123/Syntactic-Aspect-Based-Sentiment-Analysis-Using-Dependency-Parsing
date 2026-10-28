@@ -4,12 +4,11 @@ import { Menu, Play, Pause, Bell, Plus, CheckCircle, Radio } from 'lucide-react'
 import { useRealtime } from '../context/RealtimeContext';
 
 const ROUTE_INFO = {
-  '/': { title: 'Executive Sentiment Pulse', subtitle: 'Universal Dependency Aspect Analytics & Real-Time Monitoring' },
-  '/live': { title: 'Real-Time Review Feed', subtitle: 'Live Review Ingestion, Smart Alerts & Source Telemetry' },
+  '/': { title: 'Executive Sentiment Pulse', subtitle: 'Universal Dependency Aspect Analytics & Telemetry' },
   '/analyze': { title: 'Dependency Tree Studio', subtitle: 'Aspect-to-Opinion Path Explorer & Explainable Predictions' },
   '/studio': { title: 'Dependency Tree Studio', subtitle: 'Aspect-to-Opinion Path Explorer & Explainable Predictions' },
-  '/lab': { title: 'Syntax Impact Lab', subtitle: 'Baseline vs. Universal Dependencies Model Comparison & Feature Ablation' },
-  '/syntax-lab': { title: 'Syntax Impact Lab', subtitle: 'Baseline vs. Universal Dependencies Model Comparison & Feature Ablation' },
+  '/compare': { title: 'Comparative Aspect Analysis', subtitle: 'Multi-Dimensional Product Benchmarking & Radar Profiles' },
+  '/aspect-qa': { title: 'Aspect-QA Engine', subtitle: 'Conversational Query Engine Grounded in Dependency Trees' },
 };
 
 export default function Header({ onOpenMobileMenu }) {
