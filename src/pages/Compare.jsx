@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Swords,
+  Scale,
   Award,
   Sparkles,
   TrendingUp,
@@ -141,11 +141,11 @@ export default function Compare() {
       {/* Hero Header */}
       <section className="compare-hero">
         <div className="hero-pill">
-          <Swords size={14} className="text-cyan" />
+          <Scale size={14} className="text-cyan" />
           <span>COMPETITIVE INTELLIGENCE & BENCHMARKING</span>
         </div>
         <h2 className="compare-title">
-          Head-to-Head <em>Product Battleground</em>
+          Comparative <em>Product Aspect Benchmark</em>
         </h2>
         <p className="compare-sub">
           Syntactically contrasts customer sentiment across competing products. Automatically aligns shared
@@ -154,7 +154,7 @@ export default function Compare() {
 
         {/* Preset Selector Buttons */}
         <div className="preset-selector-row mt-4">
-          <span className="preset-label">Battleground Presets:</span>
+          <span className="preset-label">Benchmark Presets:</span>
           {presets.map((p) => (
             <button
               key={p.key}
@@ -177,7 +177,7 @@ export default function Compare() {
             }}
           >
             <Edit3 size={14} />
-            <span>Custom Duel</span>
+            <span>Custom Benchmark</span>
           </button>
         </div>
       </section>
@@ -195,8 +195,8 @@ export default function Compare() {
             disabled={loading}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
-            {loading ? <span className="spinner-border" /> : <Swords size={16} />}
-            <span>{loading ? 'Synthesizing Trees...' : 'Run Head-to-Head Duel'}</span>
+            {loading ? <span className="spinner-border" /> : <Scale size={16} />}
+            <span>{loading ? 'Synthesizing Trees...' : 'Run Comparative Analysis'}</span>
           </button>
         </div>
 

@@ -23,14 +23,9 @@ import { useRealtime } from '../context/RealtimeContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: LayoutDashboard },
-  { to: '/mining', label: 'Review Mining & Dealbreakers', icon: Flame, badge: 'HOT' },
-  { to: '/compare', label: 'Battleground Duel', icon: Swords, badge: 'VS' },
-  { to: '/simulator', label: 'What-If Grammar Simulator', icon: FlaskConical, badge: 'LAB' },
-  { to: '/aspect-qa', label: 'Aspect-QA Engine', icon: MessageSquare, badge: 'AI' },
-  { to: '/sarcasm', label: 'Sarcasm Shield', icon: ShieldAlert, badge: 'FILTER' },
   { to: '/analyze', label: 'Dependency Studio', icon: Sparkles },
-  { to: '/live', label: 'Live Review Feed', icon: Activity, badge: 'LIVE' },
-  { to: '/lab', label: 'Syntax Impact Lab', icon: Scale, badge: 'BENCH' },
+  { to: '/compare', label: 'Comparative Aspect Analysis', icon: Scale, badge: 'COMPARE' },
+  { to: '/aspect-qa', label: 'Aspect-QA Engine', icon: MessageSquare, badge: 'AI' },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {

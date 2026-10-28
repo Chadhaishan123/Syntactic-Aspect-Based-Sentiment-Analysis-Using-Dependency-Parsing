@@ -249,11 +249,10 @@ export default function Studio() {
               result.aspects.map((asp) => {
                 const isActive = activeAspectId === asp.id;
                 return (
-                  <motion.div
+                  <div
                     key={asp.id}
                     className={`aspect-card-item ${isActive ? 'aspect-card-active' : ''}`}
                     onClick={() => setActiveAspectId(asp.id)}
-                    whileHover={{ scale: 1.01 }}
                   >
                     <div className="aspect-card-top">
                       <div className="aspect-entity-group">
@@ -294,7 +293,7 @@ export default function Studio() {
                         <span>Why This Prediction?</span>
                       </button>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })
             ) : (
