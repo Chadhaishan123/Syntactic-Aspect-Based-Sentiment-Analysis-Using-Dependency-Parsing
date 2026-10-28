@@ -5,12 +5,11 @@ import { useRealtime } from '../context/RealtimeContext';
 
 const ROUTE_INFO = {
   '/': { title: 'Executive Sentiment Pulse', subtitle: 'Universal Dependency Aspect Analytics & Real-Time Monitoring' },
-  '/analyze': { title: 'Syntactic ABSA Studio', subtitle: 'Interactive Universal Dependency Tree & Aspect-Opinion Extraction' },
-  '/live': { title: 'Real-Time Intelligence Stream', subtitle: 'Live Review Ingestion, WebSockets Broadcast & Stream Simulation' },
-  '/batch': { title: 'Batch Inspector & SemEval Benchmarks', subtitle: 'Multi-Text Processing, File Uploads & Cross-Domain Evaluation' },
-  '/insights': { title: 'Aspect Intelligence & Matrix', subtitle: 'Multidimensional Radar Profiling & Polarity Distributions' },
-  '/methodology': { title: 'Syntactic Engine Novelty & Theory', subtitle: 'Shortest Dependency Paths, Valence Shifting & Grammar Rules' },
-  '/history': { title: 'Audit Trail & Export Hub', subtitle: 'Real-Time Parsed Archives, Query Filters & Export Options' },
+  '/live': { title: 'Real-Time Review Feed', subtitle: 'Live Review Ingestion, Smart Alerts & Source Telemetry' },
+  '/analyze': { title: 'Dependency Tree Studio', subtitle: 'Aspect-to-Opinion Path Explorer & Explainable Predictions' },
+  '/studio': { title: 'Dependency Tree Studio', subtitle: 'Aspect-to-Opinion Path Explorer & Explainable Predictions' },
+  '/lab': { title: 'Syntax Impact Lab', subtitle: 'Baseline vs. Universal Dependencies Model Comparison & Feature Ablation' },
+  '/syntax-lab': { title: 'Syntax Impact Lab', subtitle: 'Baseline vs. Universal Dependencies Model Comparison & Feature Ablation' },
 };
 
 export default function Header({ onOpenMobileMenu }) {

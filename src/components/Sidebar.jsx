@@ -4,39 +4,18 @@ import {
   LayoutDashboard,
   Sparkles,
   Activity,
-  Layers,
-  BarChart3,
-  BookOpen,
-  Clock,
-  Radio,
+  Scale,
   X,
   Cpu,
   GitFork,
-  Swords,
-  FlaskConical,
-  MessageSquare,
-  ShieldAlert,
-  FolderTree,
-  Flame,
-  Scale,
 } from 'lucide-react';
 import { useRealtime } from '../context/RealtimeContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: LayoutDashboard },
-  { to: '/mining', label: 'Review Mining', icon: Flame, badge: 'REAL-TIME' },
+  { to: '/live', label: 'Live Review Feed', icon: Activity, badge: 'LIVE' },
+  { to: '/analyze', label: 'Dependency Studio', icon: Sparkles },
   { to: '/lab', label: 'Syntax Impact Lab', icon: Scale, badge: 'RESEARCH' },
-  { to: '/analyze', label: 'Syntactic Studio', icon: Sparkles },
-  { to: '/aspect-qa', label: 'Aspect-QA Engine', icon: MessageSquare, badge: 'AI' },
-  { to: '/compare', label: 'Battleground Duel', icon: Swords, badge: 'NEW' },
-  { to: '/simulator', label: 'What-If Simulator', icon: FlaskConical, badge: 'LAB' },
-  { to: '/sarcasm', label: 'Sarcasm Shield', icon: ShieldAlert, badge: 'FILTER' },
-  { to: '/taxonomy', label: 'Taxonomy Studio', icon: FolderTree, badge: 'SETUP' },
-  { to: '/live', label: 'Live Stream', icon: Activity, badge: 'LIVE' },
-  { to: '/batch', label: 'Batch & Benchmarks', icon: Layers },
-  { to: '/insights', label: 'Aspect Intelligence', icon: BarChart3 },
-  { to: '/methodology', label: 'Novelty & Grammar', icon: BookOpen },
-  { to: '/history', label: 'Audit History', icon: Clock },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
