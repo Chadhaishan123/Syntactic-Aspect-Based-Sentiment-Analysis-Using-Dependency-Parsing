@@ -4760,3 +4760,429 @@ th.arch-col-highlight {
   padding: 2px 8px;
   border-radius: 4px;
 }
+
+/* ==========================================================================
+   Real-Time Customer Review Mining & Love/Hate Engine
+   ========================================================================== */
+
+.mining-hero {
+  background: radial-gradient(circle at top right, rgba(245, 158, 11, 0.15), transparent 45%),
+              radial-gradient(circle at top left, rgba(16, 185, 129, 0.12), transparent 45%),
+              var(--bg-surface);
+}
+
+.custom-upload-btn {
+  cursor: pointer;
+  border-style: dashed;
+}
+
+.custom-upload-btn:hover {
+  border-color: #38bdf8;
+  color: #fff;
+}
+
+.stream-control-deck {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 20px 24px;
+}
+
+.stream-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.stream-status-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.live-pulse-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #64748b;
+  display: inline-block;
+}
+
+.pulse-active {
+  background: #10b981;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
+  animation: pulse-ring 1.2s infinite ease-in-out;
+}
+
+.stream-title {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0;
+}
+
+.stream-meta {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.stream-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stream-progress-track {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-base);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stream-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #10b981);
+  transition: width 0.15s ease;
+}
+
+.active-ticker-box {
+  background: var(--bg-base);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ticker-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--amber);
+  background: rgba(245, 158, 11, 0.12);
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.ticker-text {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mining KPI Cards */
+.mining-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 1000px) {
+  .mining-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.mkpi-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.2s ease;
+}
+
+.mkpi-health { border-top: 3px solid #38bdf8; }
+.mkpi-love { border-top: 3px solid #10b981; }
+.mkpi-hate { border-top: 3px solid #f43f5e; }
+.mkpi-dealbreaker { border-top: 3px solid #f59e0b; }
+
+.card-alert-glow {
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.5);
+}
+
+.mkpi-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.mkpi-val-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.mkpi-number {
+  font-size: 2.2rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: #fff;
+  line-height: 1;
+}
+
+.mkpi-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* Dealbreaker Alert Banner */
+.dealbreaker-alert-banner {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%),
+              var(--bg-surface);
+  border: 1px solid rgba(244, 63, 94, 0.35);
+}
+
+.dealbreaker-cards-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 800px) {
+  .dealbreaker-cards-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dealbreaker-alert-card {
+  background: var(--bg-base);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.db-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.db-severity-tag {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.35);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.db-review-id {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.db-quote {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--text-main);
+  font-style: italic;
+  margin: 0;
+}
+
+.db-keywords-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+}
+
+.db-label {
+  color: var(--text-dim);
+  font-weight: 700;
+}
+
+.db-kw-pill {
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+}
+
+/* Dual Love vs. Hate Matrix Boards */
+.love-board-card {
+  border-top: 3px solid #10b981;
+}
+
+.hate-board-card {
+  border-top: 3px solid #f43f5e;
+}
+
+.aspect-cards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.aspect-love-item,
+.aspect-hate-item {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.aspect-love-item:hover {
+  border-color: #10b981;
+  background: var(--bg-surface-hover);
+}
+
+.aspect-hate-item:hover {
+  border-color: #f43f5e;
+  background: var(--bg-surface-hover);
+}
+
+.aspect-selected {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.3) !important;
+}
+
+.ali-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ali-name {
+  font-size: 0.95rem;
+  color: #fff;
+}
+
+.ali-pct {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.88rem;
+}
+
+.ali-meter {
+  height: 6px;
+  background: var(--bg-base);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ali-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.fill-emerald { background: #10b981; }
+.fill-ruby { background: #f43f5e; }
+
+.ali-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ali-footer small {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
+.ali-opinions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.op-pill {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.pill-pos {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.pill-neg {
+  background: rgba(244, 63, 94, 0.15);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.no-hated-aspects {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  gap: 10px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.active-filter-tag {
+  margin-left: 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.clear-filter-btn {
+  background: transparent;
+  border: none;
+  color: #38bdf8;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.dealbreaker-flag-tag {
+  display: inline-block;
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-top: 4px;
+}

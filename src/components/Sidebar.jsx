@@ -17,11 +17,13 @@ import {
   MessageSquare,
   ShieldAlert,
   FolderTree,
+  Flame,
 } from 'lucide-react';
 import { useRealtime } from '../context/RealtimeContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Overview', icon: LayoutDashboard },
+  { to: '/mining', label: 'Review Mining', icon: Flame, badge: 'REAL-TIME' },
   { to: '/analyze', label: 'Syntactic Studio', icon: Sparkles },
   { to: '/aspect-qa', label: 'Aspect-QA Engine', icon: MessageSquare, badge: 'AI' },
   { to: '/compare', label: 'Battleground Duel', icon: Swords, badge: 'NEW' },

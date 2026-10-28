@@ -17,6 +17,7 @@ import Simulator from './pages/Simulator';
 import AspectQA from './pages/AspectQA';
 import SarcasmDetector from './pages/SarcasmDetector';
 import TaxonomyStudio from './pages/TaxonomyStudio';
+import ReviewMining from './pages/ReviewMining';
 
 import './styles.css';
 
@@ -31,6 +32,7 @@ function AppLayout() {
         <main className="app-content-area">
           <Routes>
             <Route path="/" element={<Overview />} />
+            <Route path="/mining" element={<ReviewMining />} />
             <Route path="/analyze" element={<Studio />} />
             <Route path="/studio" element={<Studio />} />
             <Route path="/compare" element={<Compare />} />

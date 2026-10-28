@@ -937,6 +937,51 @@ async def test_taxonomy_mapping_endpoint(payload: TaxonomyTestRequest):
         payload.custom_categories,
     )
 
+import review_miner
+
+class ReviewBatchRequest(BaseModel):
+    dataset_name: str = Field(default="Uploaded Review Corpus", max_length=150)
+    reviews: list[str] = Field(..., min_length=1, max_length=1000)
+
+@app.get("/api/mining/datasets")
+def get_mining_datasets():
+    return {
+        "datasets": [
+            {
+                "id": meta["id"],
+                "name": meta["name"],
+                "domain": meta["domain"],
+                "description": meta["description"],
+                "icon": meta["icon"],
+                "review_count": len(meta["reviews"])
+            }
+            for meta in review_miner.DATASET_REGISTRY.values()
+        ]
+    }
+
+@app.get("/api/mining/dataset/{dataset_id}")
+def get_mining_dataset_by_id(dataset_id: str):
+    found = review_miner.DATASET_REGISTRY.get(dataset_id)
+    if not found:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return {
+        "id": found["id"],
+        "name": found["name"],
+        "domain": found["domain"],
+        "description": found["description"],
+        "reviews": found["reviews"]
+    }
+
+@app.post("/api/mining/analyze-batch", response_model=review_miner.MiningAnalyticsResult)
+async def analyze_mining_batch(payload: ReviewBatchRequest):
+    """Mines a bulk batch of customer reviews, extracting Love vs. Hate aspects and dealbreakers in real-time."""
+    return await asyncio.to_thread(
+        review_miner.analyze_review_batch,
+        payload.reviews,
+        run_syntactic_analysis,
+        payload.dataset_name,
+    )
+
 @app.get("/api/benchmarks")
 def get_benchmarks():
     return {
