@@ -765,9 +765,218 @@ async def run_evaluation(payload: EvaluationRunRequest):
     )
     return report
 
+import comparison
 
+class CompareRequest(BaseModel):
+    name_a: str = Field(default="Product A", max_length=100)
+    texts_a: list[str] = Field(..., min_length=1, max_length=100)
+    name_b: str = Field(default="Product B", max_length=100)
+    texts_b: list[str] = Field(..., min_length=1, max_length=100)
+
+@app.get("/api/compare/presets")
+def get_comparison_presets():
+    return {
+        "presets": [
+            {
+                "key": key,
+                "title": p["title"],
+                "domain": p["domain"],
+                "name_a": p["name_a"],
+                "name_b": p["name_b"],
+                "sample_count_a": len(p["texts_a"]),
+                "sample_count_b": len(p["texts_b"]),
+                "preset_data": p
+            }
+            for key, p in comparison.COMPARISON_PRESETS.items()
+        ]
+    }
+
+@app.post("/api/compare", response_model=comparison.CompareResponse)
+async def run_product_comparison(payload: CompareRequest):
+    """Executes head-to-head syntactic aspect sentiment comparison between two entities."""
+    result = await asyncio.to_thread(
+        comparison.run_head_to_head_comparison,
+        payload.name_a,
+        payload.texts_a,
+        payload.name_b,
+        payload.texts_b,
+        run_syntactic_analysis,
+    )
+    return result
+
+import counterfactual
+
+class SimulatorSuggestRequest(BaseModel):
+    text: str = Field(..., min_length=2, max_length=500)
+
+class SimulatorRunRequest(BaseModel):
+    base_text: str = Field(..., min_length=2, max_length=500)
+    mutated_text: str = Field(..., min_length=2, max_length=500)
+    mutation_type: str = Field(default="custom", max_length=100)
+    mutation_description: str = Field(default="Interactive user perturbation", max_length=250)
+
+@app.get("/api/simulator/presets")
+def get_simulator_presets():
+    return {"presets": counterfactual.COUNTERFACTUAL_PRESETS}
+
+@app.post("/api/simulator/suggest")
+def get_simulator_suggestions(payload: SimulatorSuggestRequest):
+    return {"suggestions": counterfactual.generate_quick_mutations(payload.text)}
+
+@app.post("/api/simulator/run", response_model=counterfactual.CounterfactualResult)
+async def run_counterfactual_simulation_endpoint(payload: SimulatorRunRequest):
+    """Executes counterfactual what-if simulation comparing original vs perturbed syntax."""
+    result = await asyncio.to_thread(
+        counterfactual.run_counterfactual_simulation,
+        payload.base_text,
+        payload.mutated_text,
+        run_syntactic_analysis,
+        payload.mutation_type,
+        payload.mutation_description,
+    )
+    return result
+
+import reports
+
+class ReportGenerateRequest(BaseModel):
+    title: str = Field(default="Aspect-Based Sentiment Intelligence Brief", max_length=150)
+    organization: str = Field(default="SyntaxSense Universal Dependencies Analytics", max_length=150)
+    analyses: list[dict[str, Any]] = Field(default_factory=list)
+
+@app.post("/api/reports/generate", response_model=reports.ExecutiveReport)
+async def generate_report_endpoint(payload: ReportGenerateRequest):
+    """Synthesizes executive brief with SWOT analysis, aspect scores, and Markdown export."""
+    data = payload.analyses
+    if not data:
+        data = [a.model_dump() for a in saved_analyses(50)]
+    return await asyncio.to_thread(
+        reports.generate_executive_report,
+        data,
+        payload.title,
+        payload.organization,
+    )
+
+import aspect_qa
+import sarcasm
 
 # ---------------------------------------------------------
+# Feature 1: Automated Aspect-QA Endpoints
+# ---------------------------------------------------------
+class AspectQARequest(BaseModel):
+    question: str = Field(..., min_length=2, max_length=300)
+    reviews: list[str] = Field(default_factory=list, max_length=150)
+
+@app.get("/api/qa/presets")
+def get_qa_presets():
+    return {"presets": aspect_qa.QA_PRESET_QUESTIONS}
+
+@app.post("/api/qa/ask", response_model=aspect_qa.AspectQAResponse)
+async def ask_aspect_question_endpoint(payload: AspectQARequest):
+    """Answers natural language questions about aspects using dependency parse graphs."""
+    reviews = payload.reviews
+    if not reviews:
+        reviews = [a.text for a in saved_analyses(20)] or [
+            "The battery life is really awful, but the vibrant display is stunning.",
+            "The keyboard tactile feedback is unmatched, although the touchpad could be smoother.",
+            "Boot up time is super fast, yet the cooling fan is noticeably loud."
+        ]
+    return await asyncio.to_thread(
+        aspect_qa.answer_aspect_question,
+        payload.question,
+        reviews,
+        run_syntactic_analysis,
+    )
+
+# ---------------------------------------------------------
+# Feature 2: Syntactic Sarcasm & Irony Detector Endpoints
+# ---------------------------------------------------------
+class SarcasmRequest(BaseModel):
+    text: str = Field(..., min_length=2, max_length=500)
+
+@app.get("/api/sarcasm/presets")
+def get_sarcasm_presets():
+    return {"presets": sarcasm.SARCASM_PRESETS}
+
+@app.post("/api/sarcasm/analyze", response_model=sarcasm.SarcasmAnalysisResult)
+async def analyze_sarcasm_endpoint(payload: SarcasmRequest):
+    """Detects irony and contrasts naive bag-of-words against true syntactic polarity."""
+    return await asyncio.to_thread(
+        sarcasm.analyze_sarcasm_and_irony,
+        payload.text,
+        run_syntactic_analysis,
+    )
+
+import review_miner
+
+class ReviewBatchRequest(BaseModel):
+    dataset_name: str = Field(default="Uploaded Review Corpus", max_length=150)
+    reviews: list[str] = Field(..., min_length=1, max_length=1000)
+
+@app.get("/api/mining/datasets")
+def get_mining_datasets():
+    return {
+        "datasets": [
+            {
+                "id": meta["id"],
+                "name": meta["name"],
+                "domain": meta["domain"],
+                "description": meta["description"],
+                "icon": meta["icon"],
+                "review_count": len(meta["reviews"])
+            }
+            for meta in review_miner.DATASET_REGISTRY.values()
+        ]
+    }
+
+@app.get("/api/mining/dataset/{dataset_id}")
+def get_mining_dataset_by_id(dataset_id: str):
+    found = review_miner.DATASET_REGISTRY.get(dataset_id)
+    if not found:
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    return {
+        "id": found["id"],
+        "name": found["name"],
+        "domain": found["domain"],
+        "description": found["description"],
+        "reviews": found["reviews"]
+    }
+
+@app.post("/api/mining/analyze-batch", response_model=review_miner.MiningAnalyticsResult)
+async def analyze_mining_batch(payload: ReviewBatchRequest):
+    """Mines a bulk batch of customer reviews, extracting Love vs. Hate aspects and dealbreakers in real-time."""
+    return await asyncio.to_thread(
+        review_miner.analyze_review_batch,
+        payload.reviews,
+        run_syntactic_analysis,
+        payload.dataset_name,
+    )
+
+@app.get("/api/benchmarks")
+def get_benchmarks():
+    return {
+        "semeval_laptops": [
+            "The battery life is really awful, but the vibrant display is stunning.",
+            "The keyboard tactile feedback is unmatched, although the touchpad could be smoother.",
+            "Boot up time is super fast, yet the cooling fan is noticeably loud.",
+            "Build quality is solid and premium, but the weight is slightly heavy for travel.",
+            "The trackpad is unresponsive, while the bright screen colors look incredible."
+        ],
+        "semeval_restaurants": [
+            "The food was delicious and freshly prepared, but the wait staff was rude and inattentive.",
+            "Ambience is cozy and charming, though the pasta portion size was disappointing.",
+            "The garlic bread was crisp and flavorful, but the delivery took forever.",
+            "Cocktails were creative and tasty, but the background music was unbearably loud.",
+            "Service from the polite staff was truly commendable despite long lines outside."
+        ],
+        "smartphones_2026": [
+            "Camera details shine in daylight; low-light results are inconsistent.",
+            "The charging speed is lightning fast, but battery drains quickly with 5G enabled.",
+            "Haptic motor feels crisp, yet the software update introduced laggy animations.",
+            "OLED display brightness is gorgeous outdoors, though the curved edges register accidental touches.",
+            "Face unlock is instantaneous and reliable, but fingerprint sensor feels sluggish."
+        ]
+    }
+
 # Feature: Real-Time Smart Alerts & Emerging Complaints Endpoints
 # ---------------------------------------------------------
 @app.get("/api/alerts/active")
